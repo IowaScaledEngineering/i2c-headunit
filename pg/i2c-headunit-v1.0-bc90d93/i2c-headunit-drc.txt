@@ -1,0 +1,10 @@
+** Drc report for /home/data/design/projects/i2c-headunit/kicad/i2c-headunit/i2c-headunit.kicad_pcb **
+** Created on 2025-05-14 16:21:10 **
+
+** Found 0 DRC violations **
+
+** Found 0 unconnected pads **
+
+** Found 0 Footprint errors **
+
+** End of Report **
