@@ -36,7 +36,7 @@ LICENSE:
 #include "lcd.h"
 
 #define DEFAULT_TWI_ADDRESS 0x72
-#define DEFAULT_BACKLIGHT 29
+#define DEFAULT_BACKLIGHT 0
 #define DEFAULT_LINES 4
 #define DEFAULT_WIDTH 20
 #define  DEFAULT_DISPLAY_SYSTEM_MESSAGES  true
@@ -209,7 +209,7 @@ int main(void)
 
 	i2cSlaveInitialize(0x72, false);
 
-	lcd_backlightOn(BACKLIGHT_FULL);
+	lcd_backlightOn(BACKLIGHT_OFF);
 	lcd_init(LCD_DISP_ON);
 	lcd_clrscr();
 	lcd_gotoxy(0,0);
@@ -407,7 +407,7 @@ void updateDisplay(uint8_t incoming)
 	if (mode == MODE_NORMAL)
 	{
 		//Check to see if the incoming byte is special
-		if (SPECIAL_SETTING == incoming) //SPECIAL_SETTING is 127
+		if (SPECIAL_SETTING == incoming) //SPECIAL_SETTING is 124
 		{
 			mode = MODE_SETTING;
 		}
@@ -616,18 +616,7 @@ void updateDisplay(uint8_t incoming)
 		{
 			//Once we have 8 bytes, stop listening
 			customCharSpot = 0; //Wrap variable at max of 7
-
-			// FIXME
-			//SerLCD.createChar(customCharNumber, customCharData); //Record the array to CGRAM
-
-			//Record this custom char to EEPROM
-// FIXME
-//			for (uint8_t charSpot = 0 ; charSpot < 8 ; charSpot++)
-//				EEPROM.update(LOCATION_CUSTOM_CHARACTERS + (customCharNumber * 8) + charSpot, customCharData[charSpot]); //addr, val
-
-			//For some reason you need to re-init the LCD after a custom char is created
-			// FIXME
-			// SerLCD.begin(settingLCDwidth, settingLCDlines);
+			lcd_setup_custom(customCharNumber, customCharData);
 			mode = MODE_NORMAL; //Exit this mode
 		}
 	}
