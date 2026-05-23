@@ -98,7 +98,7 @@ ISR(TWI_vect)
 //    case I2C_NO_STATE              // No relevant state information available; TWINT = \930\94
 		case I2C_BUS_ERROR:         // Bus error due to an illegal START or STOP condition
 			i2c_state = TWSR;                 //Store TWI State as errormessage, operation also clears noErrors bit
-			TWCR = _BV(TWSTO) | _BV(TWINT); //Recover from I2C_BUS_ERROR, this will release the SDA and SCL pins thus enabling other devices to use the bus
+			TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWINT) | _BV(TWEA); //Recover from I2C_BUS_ERROR, this will release the SDA and SCL pins thus enabling other devices to use the bus
 			break;
 
 		default:     
