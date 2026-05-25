@@ -53,6 +53,9 @@ LICENSE:
 #define settingLCDwidth 20
 #define settingLCDlines 4
 
+// Long press configuration
+#define LONG_PRESS_MS 3000
+
 volatile uint8_t i2c_txBuf[2];
 const uint8_t i2c_txBufSize = sizeof(i2c_txBuf)/sizeof(i2c_txBuf[0]);
 
@@ -149,6 +152,9 @@ int main(void)
 	uint32_t lastReadTime=0, currentTime=0;
 	DebounceState8_t buttons;
 	DebounceState8_t gpio;
+	
+	// Hold timers for each of the 4 buttons
+	uint16_t buttonHoldTimers[4] = {0, 0, 0, 0};
 
 	// PORT A
 	//  PA7 - n/a
@@ -240,7 +246,34 @@ int main(void)
 			state = ((PINA & _BV(3))?0x01:0) | ((PINB & _BV(6))?0x02:0) | ((PINB & _BV(7))?0x04:0) | ((PINA & _BV(2))?0x08:0) | ((PIND & _BV(5))?0x10:0) | ((PIND & _BV(6))?0x20:0);
 			debounce8(state , &gpio);
 		
-			i2c_txBuf[0] = getDebouncedState(&buttons);
+			uint8_t debouncedButtons = getDebouncedState(&buttons);
+			
+			// Process long presses for each of the 4 buttons in the lower nibble
+			for (uint8_t i = 0; i < 4; i++)
+			{
+				if (debouncedButtons & (1 << i))
+				{
+					// Button is held down, increment hold time
+					if (buttonHoldTimers[i] < LONG_PRESS_MS)
+					{
+						buttonHoldTimers[i] += INPUT_UPDATE_MS;
+					}
+					
+					// If hold time meets or exceeds threshold, set corresponding bit in upper nibble
+					if (buttonHoldTimers[i] >= LONG_PRESS_MS)
+					{
+						debouncedButtons |= (1 << (i + 4));
+					}
+				}
+				else
+				{
+					// Button is released, clear hold timer and clear upper nibble bit
+					buttonHoldTimers[i] = 0;
+					debouncedButtons &= ~(1 << (i + 4));
+				}
+			}
+
+			i2c_txBuf[0] = debouncedButtons;
 			i2c_txBuf[1] = getDebouncedState(&gpio);
 		}
 	}
@@ -638,7 +671,4 @@ void updateDisplay(uint8_t incoming)
 		} 
 	} 
 }
-
-
-
 

@@ -41,7 +41,7 @@ DEFINES =
 SRCS = $(BASE_NAME).c debouncer.c lcd.c i2c-rx.c avr-ringbuffer.c
 INCS = debouncer.h lcd.h i2c-rx.h avr-ringbuffer.h
 
-AVRDUDE = avrdude -P $(PROGRAMMER_PORT) -c $(PROGRAMMER_TYPE) -p $(DEVICE) -B2 -F
+AVRDUDE = avrdude -P $(PROGRAMMER_PORT) -c $(PROGRAMMER_TYPE) -p $(DEVICE) -B2
 AVRDUDE_SLOW = avrdude -P $(PROGRAMMER_PORT) -c $(PROGRAMMER_TYPE) -p $(DEVICE) -B32
 
 OBJS = ${SRCS:.c=.o} ${ASM_SRC:.S=.o}
